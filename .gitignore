@@ -1,1 +1,3 @@
 sec-files/*
+venv/*
+config_chat.env
