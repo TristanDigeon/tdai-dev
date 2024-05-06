@@ -1,3 +1,8 @@
 sec-files/*
 venv/*
-config_chat.env
+config_llm-rag.env
+config_llm-func.env
+error_log.txt
+historique.txt
+historique_echanges.txt
+nohup.out

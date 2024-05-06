@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<title>Demo LLM functions</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script src="/static/jquery/jquery-3.7.1.min.js"></script>
+		<link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/static/fontawsome/all.css">		
+		<link rel="stylesheet" type="text/css" href="/static/css/style.css"/>
+
+		<!-- Chessboard -->
+		<script src="/static/js/chessboard-1.0.0.js"></script>
+		<link rel="stylesheet" href="/static/css/chessboard-1.0.0.css">
+
+		<link rel="icon" href="../static/favicon.svg" />
+	</head>
+	
+	<body>
+
+		<!-- Assistant function test -->
+
+		<div class="container-fluid">
+			
+			<div class="row justify-content-center">		
+				
+				<div class="col-md-8 col-xl-6 chat">
+					<div class="card">
+						<div class="card-header msg_head">
+							<div class="d-flex bd-highlight">
+								<!-- <div class="img_cont">
+									<img src="/static/images/ico-board.png" class="user_img" alt="image de profil">
+									<span class="online_icon"></span>
+								</div> -->
+								<div class="user_info">
+									<span>Assistant test function</span>
+									<p>Lancez la conversation avec 'bonjour'</p>
+
+									<div id="loadingSpinner" class="loader" style="display: none;">
+										<div id="bloc-attente">											
+											<div id="chronometre"><em>En attente de réponse depuis <span id="temps-ecoule"></span> secondes</em></div>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+						<div id="messageFormeight" class="card-body msg_card_body">
+												
+							
+						</div>
+						<div class="card-footer">
+							<form id="messageArea" class="input-group">
+                                <input type="text" id="text" name="msg" placeholder="Entrez votre message..." autocomplete="off" class="form-control type_msg" required/>
+								<div class="input-group-append">
+									<button type="submit" id="send" class="input-group-text send_btn" title="envoi"><i class="fas fa-location-arrow"></i></button>
+								</div>
+							</form>
+						</div>
+					<!-- 	<div id="moteur-llm-1">							
+							<label for="llm-select"></strong></label>			
+							<select name="llm-1" id="llm-1">
+							<option value="GTP-3-Turbo">GTP-3.5</option>						
+							<option value="GTP-4-Turbo">GTP-4</option> 
+							</select>
+						</div> -->
+					</div>
+				</div>
+				<!-- <div id="reference" class="justify-content-center">
+					<img src="/static/images/ref_up.png" class="ref_image" alt="image de profil">
+					<div class="user_info"><p>Référence pour le calul</p></div>
+				</div> -->
+			</div>
+		</div>
+
+		
+
+		<!-- Chess Assistant  -->
+			
+		<div class="row justify-content-center">		
+			
+			<div class="col-md-8 col-xl-6 chat-2">
+				<div class="card">
+					<div class="card-header msg_head">
+						<div class="d-flex bd-highlight">
+							<div class="img_cont">
+								<img src="/static/images/ChessBoard-1-300x300.png" class="user_img" alt="image de profil">
+								<span class="online_icon"></span>
+							</div>
+							<div class="user_info">
+								<span>Assistant échiquier</span>
+								<p>Décrivez une postistion en donnant le type des pièces et leur couleur</p>
+
+								<div id="loadingSpinner-2" class="loader" style="display: none;">
+									<div id="bloc-attente-2">										
+										<div id="chronometre-2"><em>En attente de réponse depuis <span id="temps-ecoule-2"></span> secondes</em></div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<div id="messageFormeight-2" class="card-body msg_card_body">
+					
+												
+					</div>
+					<div class="card-footer">
+						<form id="messageArea-2" class="input-group">
+							<input type="text" id="text-2" name="msg_2" placeholder="Entrez votre message (chess)..." autocomplete="off" class="form-control type_msg" required/>
+							<div class="input-group-append">
+								<button type="submit" id="send-2" class="input-group-text send_btn" title="envoi"><i class="fas fa-location-arrow"></i></button>
+							</div>
+						</form>
+					</div>
+					<!-- <div id="moteur-llm-2">						
+						<label for="llm-select"></strong></label>			
+						<select name="llm-2" id="llm-2">
+						<option value="GTP-3-Turbo">GTP-3.5</option>						
+						<option value="GTP-4-Turbo">GTP-4</option> 
+						</select>
+					</div> -->
+				</div>
+			</div>
+			<div id="reference-2" class="justify-content-center">
+				<div id="board2" style="width: 400px"></div>				
+				<button id="clearBtn">Vider l'échiquier</button>
+				<button id="startBtn">Position initiale</button>
+				<button id="cmate">Test position</button>
+			</div>
+		</div>
+	
+	</div>
+
+		
+		
+		<script>
+			
+			/*chessboard*/
+			var board2 = Chessboard('board2', {
+				draggable: true,
+				dropOffBoard: 'trash',
+				sparePieces: false
+				})
+
+				$('#startBtn').on('click', board2.start)
+				$('#clearBtn').on('click', board2.clear)
+
+				$('#cmate').on('click', function () {
+				board2.position({
+					a4: 'bK',
+					c4: 'wK',
+					a7: 'wR'
+				})
+				})
+
+
+
+			/* function test */
+			$(document).ready(function() {
+				$("#messageArea").on("submit", function(event) {
+					const date = new Date();
+					let hour = date.getHours().toString();
+					let minute = date.getMinutes().toString();
+
+					// Ajouter un zéro devant si nécessaire
+					hour = hour.padStart(2, '0');
+					minute = minute.padStart(2, '0');
+
+					const str_time = hour + ":" + minute;
+
+					var rawText = $("#text").val();
+
+					var userHtml = '<div class="d-flex justify-content-end mb-4 fadeInUp"><div class="msg_cotainer_send">' + rawText + '<span class="msg_time_send">'+ str_time + '</span></div><div class="img_cont_msg"><img src="/static/images/human.svg" class="user_img_msg" alt="profil humain"></div></div>';
+					
+					$("#text").val("");
+					$("#messageFormeight").append(userHtml);
+					scrollToBottom();  
+					// Afficher l'indicateur de chargement
+					$("#loadingSpinner").show();
+					demarrerChronometre()
+
+					$.ajax({
+						data: {
+							msg: rawText,	
+						},
+						type: "POST",
+						url: "/get",
+					}).done(function(data) {
+						// Masquer l'indicateur de chargement
+						$("#loadingSpinner").hide();
+						demarrerChronometre()
+						var botHtml = '<div class="d-flex justify-content-start mb-4 fadeInUp"><div class="img_cont_msg"><img src="/static/images/robot.svg" class="user_img_msg" alt="profil bot"></div><div class="msg_cotainer">' + data + '<span class="msg_time">' + str_time + '</span></div></div>';
+						$("#messageFormeight").append($.parseHTML(botHtml));
+						scrollToBottom();  
+					});
+					event.preventDefault();
+				});
+			});
+
+			/* Chess */
+			$(document).ready(function() {
+				$("#messageArea-2").on("submit", function(event) {
+					const date = new Date();
+					let hour = date.getHours().toString();
+					let minute = date.getMinutes().toString();
+
+					// Ajouter un zéro devant si nécessaire
+					hour = hour.padStart(2, '0');
+					minute = minute.padStart(2, '0');
+
+					const str_time_2 = hour + ":" + minute;
+
+					var rawText_2 = $("#text-2").val();
+
+					var userHtml_2 = '<div class="d-flex justify-content-end mb-4 fadeInUp"><div class="msg_cotainer_send">' + rawText_2 + '<span class="msg_time_send">'+ str_time_2 + '</span></div><div class="img_cont_msg"><img src="/static/images/human.svg" class="user_img_msg" alt="profil humain"></div></div>';
+					
+					$("#text-2").val("");
+					$("#messageFormeight-2").append(userHtml_2);
+					scrollToBottom_2();  
+					// Afficher l'indicateur de chargement
+					$("#loadingSpinner-2").show();
+					demarrerChronometre_2()
+
+					$.ajax({
+						data: {
+							msg_2: rawText_2,	
+						},
+						type: "POST",
+						url: "/get_chess_position",
+					}).done(function(response) {
+						// Masquer l'indicateur de chargement
+						$("#loadingSpinner-2").hide();						
+						/* demarrerChronometre_2();  */
+
+						const responseType = response.type;
+        				const data = response.data;
+						console.log("retour ajax : " + responseType + " - " + data);
+
+						if (responseType === "chess") {
+						// Exécuter la fonction pour la position d'échecs
+						console.log("Data for chess position: null");
+						board2.clear();
+										
+						console.log("board clear! ok");
+						console.log("REAL chess position:" + data);
+						var positionData = (typeof data === 'string') ? JSON.parse(data) : data;
+						console.log("PARSE chess position:" + positionData);
+						/* board2.position(data); */
+						board2.position(positionData);
+
+						  // Test avec un exemple hardcodé
+						/*board2.position({
+								a4: 'bK',
+								c4: 'wK',
+								a7: 'wR'
+							}); */
+							console.log("position set ok");
+
+
+						} else if (responseType === "message") {
+            			// Afficher le message comme auparavant
+
+						var botHtml_2 = '<div class="d-flex justify-content-start mb-4 fadeInUp"><div class="img_cont_msg"><img src="/static/images/robot.svg" class="user_img_msg" alt="profil bot"></div><div class="msg_cotainer">' + data + '<span class="msg_time">' + str_time_2 + '</span></div></div>';
+						$("#messageFormeight-2").append($.parseHTML(botHtml_2));
+						scrollToBottom_2();}  
+					});
+					event.preventDefault();
+				});
+			});
+
+			/* test */
+			function scrollToBottom() {
+				var messagesContainer = document.getElementById("messageFormeight");
+				messagesContainer.scrollTop = messagesContainer.scrollHeight;
+			}
+
+			/* chess */
+			function scrollToBottom_2() {
+				var messagesContainer_2 = document.getElementById("messageFormeight-2");
+				messagesContainer_2.scrollTop = messagesContainer_2.scrollHeight;
+			} 
+
+			/* test */
+			// Timer V2
+			let intervalId = null; // Identifiant pour le contrôle de l'intervalle
+			function demarrerChronometre() {
+				// Si un chronomètre est déjà en cours, l'arrêter
+				if (intervalId !== null) {
+					clearInterval(intervalId);
+				}
+
+				let tempsEcoule = 0; // Réinitialiser le temps écoulé
+				const tempsEcouleElement = document.getElementById("temps-ecoule");
+
+				function miseAJourChronometre() {
+					tempsEcouleElement.textContent = tempsEcoule;
+					tempsEcoule++;
+				}
+
+				// Mise à jour toutes les secondes et stocker l'identifiant de l'intervalle
+				intervalId = setInterval(miseAJourChronometre, 1000);
+			}
+
+			/* chess */
+			// Timer V2
+			let intervalId_2 = null; // Identifiant pour le contrôle de l'intervalle
+			function demarrerChronometre_2() {
+				// Si un chronomètre est déjà en cours, l'arrêter
+				if (intervalId_2 !== null) {
+					clearInterval(intervalId_2);
+				}
+
+				let tempsEcoule = 0; // Réinitialiser le temps écoulé
+				const tempsEcouleElement = document.getElementById("temps-ecoule-2");
+
+				function miseAJourChronometre_2() {
+					tempsEcouleElement.textContent = tempsEcoule;
+					tempsEcoule++;
+				}
+
+				// Mise à jour toutes les secondes et stocker l'identifiant de l'intervalle
+				intervalId_2 = setInterval(miseAJourChronometre_2, 1000);
+			}
+
+ 			
+
+
+		</script>
+        
+    </body>
+</html>
