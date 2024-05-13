@@ -15,8 +15,9 @@ import logging
 # Charger les variables d'environnement à partir du fichier .env
 from dotenv import load_dotenv
 load_dotenv('config_llm-func.env')
-#récupére la clé pour la passé aux template et tester l'état des Runs
+#récupére la clé pour la passer aux template et tester l'état des Runs
 openai_api_key = os.getenv('OPENAI_API_KEY')
+
 
 #initialisation depuis OPENAI_API_KEY chargée depuis un .env
 client = OpenAI(api_key=openai_api_key)
