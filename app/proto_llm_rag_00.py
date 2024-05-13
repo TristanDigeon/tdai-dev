@@ -1,24 +1,17 @@
 import os
 import gradio as gr
-from openai import OpenAI
-#from openai import AsyncOpenAI
-import pinecone
 import json
 import time
 
+from openai import OpenAI
 from dotenv import load_dotenv
+from pinecone import Pinecone, ServerlessSpec
 
-# Charger les variables d'environnement à partir du fichier .env
-load_dotenv('config_chat.env')
+# Charge les variables d'environnement à partir du fichier.env
+load_dotenv('config_llm-rag.env')
 
-# get api key from app.pinecone.io
-api_key = os.environ.get('PINECONE_API_KEY')
-# find your environment next to the api key in pinecone console
-env = os.environ.get('PINECONE_ENVIRONMENT') 
-
-pinecone.init(
-    api_key=api_key,
-    environment=env
+pc = Pinecone(
+        api_key=os.environ.get("PINECONE_API_KEY")
 )
 
 GPT_MODEL_3T = "gpt-3.5-turbo"
@@ -26,21 +19,14 @@ GPT_MODEL_4 = "gpt-4"
 GPT_MODEL_4T = "gpt-4-1106-preview"
 EMBEDDING_MODEL = "text-embedding-ada-002"
 GPT_MODEL = "gpt-3.5-turbo"
-#GPT_MODEL = "gpt-4"
-#GPT_MODEL = "gpt-4-1106-preview"
 
 #Step 0: initialiser le client
 client = OpenAI()
-#client = AsyncOpenAI() #ne pas utliser
-
 
 #connection à l'index
 index_name = "protorag"
-index = pinecone.Index(index_name)
+index = pc.Index(index_name)
 
-#new sdk 1.2
-    #client = OpenAI()    
-    #completion = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "Hello world"}])
 
 ####Embedings###
 def emb_txt(entree):    
@@ -184,7 +170,7 @@ def choix_reference(reference):
 
 
 ####Chat###
-def reponseChat(reference, questionREF, temperature):        
+def reponseChatTT(reference, questionREF, temperature):        
     """
     génére la réponse du chat, mode pyhton direct (traduction en Langchain à faire)
     """
@@ -330,7 +316,6 @@ def chat_rag(message, history):
 
 
 ################TRUE CHATBOTS##############
-
 """ def show_json(obj):
     run(json.loads(obj.model_dump_json())) """
 
@@ -454,11 +439,14 @@ with gr.Blocks(theme=gr.themes.Soft(font=("Verdana", "sans-serif", "system-ui"))
     
     
     
-    text_button_param.click(reponseChat, inputs=[dropdown_param, inner_param, slide_param], outputs=output_param)
+    text_button_param.click(reponseChatTT, inputs=[dropdown_param, inner_param, slide_param], outputs=output_param)
     text_button_inst.click(reponseChatparam, inputs=[dropdown_inst, inner_inst, slide_inst, dropdown_inst_model,inner_instructions_inst,inner_prompt_inst ], outputs=output_inst)
     text_button_emb.click(emb_txt, inputs=inner_emb, outputs=output_emb)
     text_button_ret.click(query_retrive, inputs=[inner_top_ret, inner_ret], outputs=output_ret)
   
+
+""" interface.launch(server_name='0.0.0.0', server_port=7860, ssl_verify=True, ssl_certfile='/etc/letsencrypt/live/xxxxx', ssl_keyfile='/etc/letsencrypt/live/xxxxx') """
+interface.launch()
 
 
 
