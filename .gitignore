@@ -1,8 +1,11 @@
 sec-files/*
 venv/*
+venv
 config_llm-rag.env
 config_llm-func.env
+config_chat.env
 error_log.txt
 historique.txt
 historique_echanges.txt
 nohup.out
+test.py
