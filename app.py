@@ -13,8 +13,11 @@ import logging
 
 ###############Initialisation client OPEN AI############################
 # Charger les variables d'environnement à partir du fichier .env
-from dotenv import load_dotenv
-load_dotenv('config_chat.env')
+
+#env local
+#from dotenv import load_dotenv
+#load_dotenv('config_chat.env')
+
 #récupére la clé pour la passer aux template et tester l'état des Runs
 openai_api_key = os.getenv('OPENAI_API_KEY')
 
