@@ -19,7 +19,7 @@ import logging
 #load_dotenv('config_chat.env')
 
 #récupére la clé pour la passer aux template et tester l'état des Runs
-openai_api_key = os.getenv('OPENAI_API_KEY')
+openai_api_key = os.getenv('OPENAI_API_KEY_TDAI')
 
 
 #initialisation depuis OPENAI_API_KEY chargée depuis un .env
@@ -448,12 +448,11 @@ def index():
     global global_thread_infos, global_thread_infos_2, global_log_file
 
 
-    #assistant = os.getenv('ASST_GTP4')
-    #assistant = os.getenv('ASST_GTP3')
+    
 
     #CHESS
-    assistant_2 = os.getenv('ASST_CHESS_GTP4')
-    #assistant_2 = os.getenv('ASST_CHESS_GTP3')
+    assistant_2 = os.getenv('ASST_CHESS_TDAI_GTP4o')
+    
     
 
     global_log_file = "historique.txt"       
